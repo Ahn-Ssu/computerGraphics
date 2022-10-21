@@ -1,0 +1,10 @@
+^C:\USERS\GCV-AHNSSU\GIT\COMPUTERGRAPHICS\01. SETTING TUTORIAL\BUILD\CMAKEFILES\361DDC1F37465AF98397F5EFD5CFEA98\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/GCV-ahnssu/git/computerGraphics/01. setting tutorial" "-BC:/Users/GCV-ahnssu/git/computerGraphics/01. setting tutorial/build" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "C:/Users/GCV-ahnssu/git/computerGraphics/01. setting tutorial/build/camke_project_example.sln"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
