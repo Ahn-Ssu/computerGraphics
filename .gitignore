@@ -31,4 +31,4 @@
 *.out
 *.app
 
-01_tutorial/build/
+*/build
