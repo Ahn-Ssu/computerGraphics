@@ -1,5 +1,4 @@
-#include "common.h"
-#include "shader.h"
+#include "context.h"
 
 #include <spdlog/spdlog.h>
 #include <glad/glad.h> // path가 왜 이렇게 지정되는지 잘 모르겠으면 build로 컴파일 해놓고 보면 됨
@@ -80,8 +79,7 @@ int main(int argc, const char **argv)
 
     // glad를 활용한 OpenGL 함수 로딩
     // OpenGL context를 생성한 이후에 실행.
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
         SPDLOG_ERROR("failed to initialize glad");
         glfwTerminate();
         return -1;
@@ -90,10 +88,12 @@ int main(int argc, const char **argv)
     auto glVersion = glGetString(GL_VERSION);
     SPDLOG_INFO("OpenGL context version: {}", glVersion);
 
-    auto vertexShader = Shader::CreateFromFile("./shader/simple.vs", GL_VERTEX_SHADER);
-    auto fragmentShader = Shader::CreateFromFile("./shader/simple.fs", GL_FRAGMENT_SHADER);
-    SPDLOG_INFO("vertex shader id: {}", vertexShader->Get());
-    SPDLOG_INFO("fragment shader id: {}", fragmentShader->Get());
+    auto context = Context::Create();
+    if (!context){
+        SPDLOG_ERROR("failed to create context");
+        glfwTerminate();
+        return -1;
+    }
 
     // callback을 glfw쪽에서 호출을 할 수 있도록 설정
     // 당연히, gl function이 loading 된 후에.
@@ -103,14 +103,11 @@ int main(int argc, const char **argv)
 
     // glfw 루프 실행, 윈도우 close 버튼을 누르면 정상 종료
     SPDLOG_INFO("Start main loop");
-    while (!glfwWindowShouldClose(window))
-    {
+    while (!glfwWindowShouldClose(window)){
         glfwPollEvents(); // 윈도우와 interaction을 수집하는 함수
         // 없으면 실행이 너무 빨리 되어서 멈추지 않음
-
-        glClearColor(0.1f, 0.2f, 0.3f, 0.0f); // 랜더링 코드, 컬러 프레임버퍼 화면을 클리어할 색상을 지정함
-        glClear(GL_COLOR_BUFFER_BIT);         // 실제로 프레임버퍼를 클리어하는 친구, (위에서 설정한 색으로 버퍼를 초기화 해버림) 사이즈 바꿔도 이제 frame 짤리지 않음
-
+        context->Render();
+        
         // 화면에 그림을 그리는 과정
         // 프레임버퍼 2개를 준비 (front/back)
         // back buffer에 그림 그리기 ; front에 그림을 그리면, 그림을 그리는 과정이 보여서 더러움
@@ -120,6 +117,7 @@ int main(int argc, const char **argv)
         glfwSwapBuffers(window);
     }
 
+    context.reset(); // context = nullptr; 이거 소유권 증발시켜서 메모리 해제 시키는 방법임
     glfwTerminate();
     return 0;
 }

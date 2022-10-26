@@ -53,3 +53,21 @@ Smart pointer
 일반 포인터 문제케이스
 - 반드시 메모리 해제를 해줘야 함; delete 메모리 블록만큼의 mem leak이 발생
 - 메모리를 두번 해제하면 문제 발생; double free problem -> 프로그램 죽을 가능성
+
+
+Program class design
+- program 클래스 설계
+    - vertex shader, fragment shader를 연결한 pipeline program
+    - 이 program을 이용해서 최종적으로 그림을 그린다.
+    - 두 개의 shader를 입력 받아서 program을 링크시긴다
+    - 링크에 성공하면 OpenGL program object를 생성
+    - 실패하면 메모리 할당 해제를
+
+코드 리팩토링 
+- 프로그램 라이프사이클을 고려하여 코드 리팩토링
+    - GLFW / OpenGL Context / GLAD 초기화
+    - 그림을 그리기 위한 OpenGL objects 생성 (shader / program)
+    - 렌더링
+    - OpenGL objects 제거
+    - GLFW 종료 / 프로그램 종료
+- OpenGL object 들을 관리하고 렌더링하는 코드를 분리하자
