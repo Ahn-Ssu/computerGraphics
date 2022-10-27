@@ -18,6 +18,8 @@ private:
     uint32_t m_vertexBuffer;
     // Context 클래스에 VAO를 담아둘 변수 선언
     uint32_t m_vertexArrayObject;
+    // Context 클래스에 인덱스 버퍼로 사용할 멤버 추가
+    uint32_t m_indexBuffer;
 };
 
 #endif // __CONTEXT_H__

@@ -13,10 +13,16 @@ ContextUPtr Context::Create()
 bool Context::Init()
 {
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f,
-  };
+        0.5f, 0.5f, 0.0f,   // top right
+        0.5f, -0.5f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f, // bottom left
+        -0.5f, 0.5f, 0.0f,  // top left
+    };
+    uint32_t indices[] = { // note that we start from 0!
+        0, 1, 3, // first triangle
+        1, 2, 3, // second triangle
+    };
+
     // buffer object를 생성하기전에 array object를 먼저 만들 것
     // VAO binding -> VBO binding -> vertex attribute setting; VBO description to VAO
   	glGenVertexArrays(1, &m_vertexArrayObject); // 생성
@@ -25,7 +31,7 @@ bool Context::Init()
     glGenBuffers(1, &m_vertexBuffer); // vertex buffer 생성
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer); // array buffer에 관련된 동작을 위해 특정 버퍼를 바인딩 (무조건 선행되어야함)
         // GL_ARRAY_BUFFER: 사용할 buffer object는 vertex data를 저장할 용도임을 알려줌
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 9, vertices,GL_STATIC_DRAW); // 데이터 복사 과정,
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 12, vertices,GL_STATIC_DRAW); // 데이터 복사 과정,
     // glBufferData(): 지정된 buffer에 데이터를 복사한다
         // 데이터의 총 크기, 데이터 포인터, 용도를 지정
         // 용도는 "STATIC | DYNAMIC | STREAM", "DRAW | COPY | READ"의 조합
@@ -43,6 +49,10 @@ bool Context::Init()
     // normalized: 0~1사이의 값인가
     // stride: 두 정점간의 간격 (byte 단위)
     // offset: 첫 정점의 헤당 attribute까지의 간격 (byte 단위)
+
+    glGenBuffers(1, &m_indexBuffer);    
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * 6,indices, GL_STATIC_DRAW);
 
 
 
@@ -76,8 +86,10 @@ void Context::Render()
     // for text code
     glUseProgram(m_program->Get());
     // glDrawArrays(GL_POINTS, 0, 1);
-    glDrawArrays(GL_LINE_STRIP, 0, 3); // 이제 삼각형을 그리라는 것 
+    // glDrawArrays(GL_TRIANGLES, 0, 6); // 이제 삼각형을 그리라는 것 
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
+
 
 
 // glDrawArray(primitive, offset, count)
@@ -85,3 +97,20 @@ void Context::Render()
     // primitive: 그리고자 하는 primitive 타입
     // offset: 그리고자 하는 첫 정점의 index
     // count: 그리려는 정점의 총 개수
+
+// glDrawArrays()를 이용하여 그림을 그리려면 정점이 6개가 필요
+// 정점의 낭비가 있음
+
+
+// Element Buffer Object (EBO)
+// 정점의 인덱스를 저장할 수 있는 버퍼
+// 인덱스 버퍼라고도 부름
+// 정점 정보와 별개로 정점의 인덱스로만 구성된 삼각형 정보를 전달 가능
+// indexed drawing
+
+// glDrawElements(primitive, count, type, pointer/offset)
+    // 현재 바인딩된 VAO, VBO, EBO를 바탕으로 그리기
+    // primitive: 그려낼 기본 primitive 타입
+    // count: 그리고자 하는 EBO 내 index의 개수
+    // type: index의 데이터형
+    // pointer/offset: 그리고자 하는 EBO의 첫 데이터로부터의 오프셋
