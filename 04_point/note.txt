@@ -71,3 +71,14 @@ Program class design
     - OpenGL objects 제거
     - GLFW 종료 / 프로그램 종료
 - OpenGL object 들을 관리하고 렌더링하는 코드를 분리하자
+
+
+삼각형 그리기 위한 정점 입력
+정점을 3개 입력하여 삼각형을 그려보자
+    정점 데이터 준비
+    Vertex buffer object (VBO) 준비
+    Vertex buffer object에 정점 데이터 입력
+        CPU memory 상에 있는 정점 데이터를 GPU로 옮기는 작업
+    Vertex array object (VAO) 준비
+        우리의 정점 데이터의 구조를 알려주는 descriptor object
+    Program, VBO, VAO를 사용하여 그림 그리기
