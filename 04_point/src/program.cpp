@@ -38,6 +38,10 @@ Program::~Program() {
   }
 }
 
+void Program::Use() const {
+    glUseProgram(m_program);
+}
+
 
 // glCreateProgram(): OpenGL program object 생성
 // glAttachShader(): program에 shader를 붙이기

@@ -10,7 +10,8 @@ public:
     static ProgramUPtr Create(const std::vector<ShaderPtr>& shaders); // reference type이 인자임 (복사가 되지 않음)
 
     ~Program();
-    uint32_t Get() const { return m_program; }    
+    uint32_t Get() const { return m_program; }  
+    void Use() const;  
 private:
     Program() {}
     bool Link(const std::vector<ShaderPtr>& shaders);

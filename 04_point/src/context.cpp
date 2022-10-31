@@ -25,23 +25,16 @@ bool Context::Init()
 
     // buffer object를 생성하기전에 array object를 먼저 만들 것
     // VAO binding -> VBO binding -> vertex attribute setting; VBO description to VAO
-  	glGenVertexArrays(1, &m_vertexArrayObject); // 생성
-    glBindVertexArray(m_vertexArrayObject);     // 바인딩
+    m_vertexLayout = VertexLayout::Create();
+    m_vertexBuffer = Buffer::CreateWithData(
+                                GL_ARRAY_BUFFER,
+                                GL_STATIC_DRAW,
+                                vertices,
+                                sizeof(float) * 12);
 
-    glGenBuffers(1, &m_vertexBuffer); // vertex buffer 생성
-    glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer); // array buffer에 관련된 동작을 위해 특정 버퍼를 바인딩 (무조건 선행되어야함)
-        // GL_ARRAY_BUFFER: 사용할 buffer object는 vertex data를 저장할 용도임을 알려줌
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 12, vertices,GL_STATIC_DRAW); // 데이터 복사 과정,
-    // glBufferData(): 지정된 buffer에 데이터를 복사한다
-        // 데이터의 총 크기, 데이터 포인터, 용도를 지정
-        // 용도는 "STATIC | DYNAMIC | STREAM", "DRAW | COPY | READ"의 조합
-            // STATIC draw -> 버퍼에 위치를 세팅하고 다시는 안 바꿀 것이당.
-            // DYNAMIC draw -> 자주 바꿀 것이당
-            // STREAM draw -> 버퍼를 한번 세팅 하고 그린 후 바로 버릴 예정 
-    // VBO가 가진 정점에 대한 구조(layout)를 알려줄 방법이 있어야 함 --> vertex array object
-
-    glEnableVertexAttribArray(0); // glEnableVertexAttribArray(n): 정점 attribute 중 n번째를 사용하도록 설정
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0); 
+    
+    
+    m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0); 
     // 점의 위치를 어떻게 생겼는지 묘사를 하는 것
     //     n: 정점의 n번째 attribute
     // size: 해당 attribute는 몇개의 값으로 구성되어 있는가?
@@ -50,9 +43,11 @@ bool Context::Init()
     // stride: 두 정점간의 간격 (byte 단위)
     // offset: 첫 정점의 헤당 attribute까지의 간격 (byte 단위)
 
-    glGenBuffers(1, &m_indexBuffer);    
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * 6,indices, GL_STATIC_DRAW);
+    m_indexBuffer = Buffer::CreateWithData(
+                                GL_ELEMENT_ARRAY_BUFFER,
+                                GL_STATIC_DRAW,
+                                indices,
+                                sizeof(uint32_t) * 6);
 
 
 
@@ -84,7 +79,7 @@ void Context::Render()
     glClear(GL_COLOR_BUFFER_BIT);
 
     // for text code
-    glUseProgram(m_program->Get());
+    m_program->Use();
     // glDrawArrays(GL_POINTS, 0, 1);
     // glDrawArrays(GL_TRIANGLES, 0, 6); // 이제 삼각형을 그리라는 것 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

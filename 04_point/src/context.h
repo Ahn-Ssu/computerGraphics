@@ -4,6 +4,8 @@
 #include "common.h"
 #include "shader.h"
 #include "program.h"
+#include "buffer.h"
+#include "vertex_layout.h"
 
 CLASS_PTR(Context)
 class Context {
@@ -14,12 +16,10 @@ private:
     Context() {}
     bool Init();
     ProgramUPtr m_program;
-    // VBO를 담아둘 uint32_t형 멤버 변수를 Context 클래스에 선언
-    uint32_t m_vertexBuffer;
-    // Context 클래스에 VAO를 담아둘 변수 선언
-    uint32_t m_vertexArrayObject;
-    // Context 클래스에 인덱스 버퍼로 사용할 멤버 추가
-    uint32_t m_indexBuffer;
+
+    VertexLayoutUPtr m_vertexLayout;
+    BufferUPtr m_vertexBuffer;
+    BufferUPtr m_indexBuffer;
 };
 
 #endif // __CONTEXT_H__
