@@ -1,0 +1,110 @@
+#version version_number  // C와 같은 매크로, 얘는 version을 지정 할 수 있음
+
+// in, out, uniform은 qualifier 하고, 인풋 아웃풋 등을 지칭함
+
+in type in_variable_name;
+in type in_variable_name;
+
+out type out_variable_name;
+
+uniform type uniform_name;
+
+void main() { // C-like language이기 때문에 main() 함수를 통해 수행을 하게 됨 
+  // process input(s) and do some weird graphics stuff ...
+  // output processed stuff to output variable
+  out_variable_name = weird_stuff_we_processed;
+}
+
+<GLSL>
+
+OpenGL Shader Language
+    Shader: GPU 상에서 동작하는 그림을 그리기 위한 작은 프로그램
+    정점별 / 픽셀별로 병렬 수행되어 성능을 높임
+    GLSL: OpenGL에서 shader를 작성하기 위해 제공하는 C 기반 언어
+    그 외의 대표적인 shader language
+        HLSL: DirectX용 shader language
+        Metal: Metal용 shader language
+        cg: nVidia가 제시한 shader language --> 찬혁이가 사용한 언어 // Unity 3D에서 자주 이용함
+
+
+GLSL에서 사용 가능한 data type
+    기본 타입: int, float, double, uint, bool
+    벡터 타입: (그래픽스 코딩을 할 때 유용하게 쓰일 타입임)
+        vecX : float형 벡터
+        bvecX: bool형 벡터
+        ivecX: int형 벡터
+        uvecX: uint형 벡터
+        dvecX: double형 벡터
+    X에는 2, 3, 4 사용 가능 // 1은 그냥 기본 타입을 사용하면 됨 (scalar 잖아..)
+    행렬 타입:
+        matX: float형 행렬
+        bmatX: bool형 행렬
+        imatX: int형 행렬
+        umatX: uint형 행렬
+        dmatX: double형 행렬
+    X에는 2, 3, 4 사용 가능
+
+
+
+VECTOR
+    벡터 원소 접근
+    .x, .y, .z, .w 인덱스를 사용
+    swizzling 가능
+        얻어오고 싶은 인덱스를 연속으로 쓰기
+        .xyz => vec3
+    .rgba, .stpq도 동일한 방식으로 사용 가능
+            예제)
+            vec2 someVec;
+            vec4 differentVec = someVec.xyxx; // swizzling의 예시
+            vec3 anotherVec = differentVec.zyw;
+            vec4 otherVec = someVec.xxxx + anotherVec.yxzy;
+            *어떤 값을 쓰던, 4개까지는 사용이 가능하다. 
+
+    벡터 초기값 선언
+        1) 생성자 사용
+        2) 다른 벡터를 섞어서 사용 가능
+
+            예제)
+            vec2 vect = vec2(0.5, 0.7);
+            vec4 result = vec4(vect, 0.0, 0.0);
+            vec4 otherResult = vec4(result.xyz, 1.0);
+
+in/out 
+    Shader의 입출력 구조
+        모든 shader는 용도에 맞는 입출력이 선언되어 있어야 함
+        in, out: shader의 입출력을 가리키는 type qualifier
+
+    1. Vertex shader
+        각 정점 별로 설정된 vertex attribute를 입력받는다
+        몇 번째 attribute를 입력받을지에 대한 추가적인 설정을 할 수 있음
+            layout (location = n)
+        반드시 정점의 출력 위치 gl_Position값을 계산해줘야 함
+    2. Rasterization
+        Vertex shader의 출력값을 primitive(삼각형, 선..)에 맞게 보간하여 픽셀별 값으로 변환 (Rasterization)
+    3. Fragment shader
+        Rasterization 과정을 거쳐 픽셀별로 할당된 vertex shader의 출력값이 입력됨
+        각 픽셀의 실제 색상 값이 출력되어야 함
+
+Uniform
+    shader에 전달 가능한 global value
+        병렬로 수행되는 모든 shader thread들이 동일한 값을 전달받는다
+    변수 선언 앞에 uniform type qualifier를 써서 선언
+
+    uniform variable에 값을 입력하는 과정
+        glGetUniformLocation()을 사용하여 program object로부터 uniform handle을 얻는다
+        program이 바인딩 된 상태에서 glUniform...()를 사용하여 값을 입력한다
+
+
+GLSL
+    C와 비슷한 문법 체계의 shader용 language
+    기본적인 수치값 타입 외에 벡터, 행렬 타입이 있음
+    in, out을 사용하여 각 shader의 입력 출력을 지정
+
+    vertex shader의 경우 layout을 사용하여 attribute index 지정
+    vertex shader의 경우 gl_Position을, fragment shader의 경우 픽셀의 최종 색상값을 출력해야 함
+    vertex shader의 out 변수들은 Rasterization 과정을 거쳐 픽셀단위로 보간되어 fragment shader의 in 변수들로 입력
+
+    uniform variable을 사용하면 shader에서 사용할 수 있는 global 값을 설정할 수 있음
+    glGetShaderLocation()으로 uniform handle을 얻을 수 있음
+    program이 바인딩된 상태에서 glUniform...()으로 uniform variable 값 설정 가능
+    필요에 따라 정점 별로 여러 개의 attribute를 설정하여 사용 가능
