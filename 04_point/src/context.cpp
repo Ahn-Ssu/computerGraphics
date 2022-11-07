@@ -12,10 +12,38 @@ ContextUPtr Context::Create()
 bool Context::Init()
 {
     float vertices[] = {
-        0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-        0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+        0.5f,
+        0.5f,
+        0.0f,
+        1.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
+        0.5f,
+        -0.5f,
+        0.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        -0.5f,
+        -0.5f,
+        0.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        0.0f,
+        -0.5f,
+        0.5f,
+        0.0f,
+        1.0f,
+        1.0f,
+        0.0f,
+        0.0f,
+        1.0f,
     };
     uint32_t indices[] = {
         // note that we start from 0!
@@ -25,11 +53,11 @@ bool Context::Init()
 
     m_vertexLayout = VertexLayout::Create();
     m_vertexBuffer = Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_STATIC_DRAW,
-                                                vertices, sizeof(float) * 32);
+                                            vertices, sizeof(float) * 32);
 
-    m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, GL_FALSE,sizeof(float) * 8, 0);
-    m_vertexLayout->SetAttrib(1, 3, GL_FLOAT, GL_FALSE,sizeof(float) * 8, sizeof(float) * 3);
-    m_vertexLayout->SetAttrib(2, 2, GL_FLOAT, GL_FALSE,sizeof(float) * 8, sizeof(float) * 6);
+    m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 0);
+    m_vertexLayout->SetAttrib(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, sizeof(float) * 3);
+    m_vertexLayout->SetAttrib(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, sizeof(float) * 6);
 
     m_indexBuffer = Buffer::CreateWithData(
         GL_ELEMENT_ARRAY_BUFFER,
@@ -54,20 +82,25 @@ bool Context::Init()
     auto image = Image::Load("./image/container.jpg");
     if (!image)
         return false;
+    // auto image = Image::Create(512, 512);
+    // image->SetCheckImage(16, 16);
     SPDLOG_INFO("image: {}x{}, {} channels",
                 image->GetWidth(), image->GetHeight(), image->GetChannelCount());
 
-    glGenTextures(1, &m_texture);
-    glBindTexture(GL_TEXTURE_2D, m_texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);   // interpolation method
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);// S -> texture x axis
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);// T -> texture y axis
+    m_texture = Texture::CreateFromImage(image.get()); // *.get(); return a normal pointer
 
-    // target(binding object),  texutre informationz of GPU
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,
-        image->GetWidth(), image->GetHeight(), 0,
-        GL_RGB, GL_UNSIGNED_BYTE, image->GetData()); 
+    auto image2 = Image::Load("./image/awesomeface.png");
+    m_texture2 = Texture::CreateFromImage(image2.get());
+
+    glActiveTexture(GL_TEXTURE0); // indicate textrue slot index 
+    glBindTexture(GL_TEXTURE_2D, m_texture->Get()); // pass texture index
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_texture2->Get());
+
+    m_program->Use();
+    glUniform1i(glGetUniformLocation(m_program->Get(), "tex"), 0);
+    glUniform1i(glGetUniformLocation(m_program->Get(), "tex2"), 1);
+
 
     return true;
 }
