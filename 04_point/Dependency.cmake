@@ -1,19 +1,19 @@
 include(ExternalProject)
 
-set(DEP_INSTALL_DIR ${PROJECT_BINARY_DIR}/install)  
+set(DEP_INSTALL_DIR ${PROJECT_BINARY_DIR}/install)
 set(DEP_INCLUDE_DIR ${DEP_INSTALL_DIR}/include)
 set(DEP_LIB_DIR ${DEP_INSTALL_DIR}/lib)
 
 ExternalProject_Add(
-    dep_spdlog 
-    GIT_REPOSITORY "https://github.com/gabime/spdlog.git" 
-    GIT_TAG "v1.x" 
-    GIT_SHALLOW 1  
-    UPDATE_COMMAND "" TEST_COMMAND "" PATCH_COMMAND "" 
+    dep_spdlog
+    GIT_REPOSITORY "https://github.com/gabime/spdlog.git"
+    GIT_TAG "v1.x"
+    GIT_SHALLOW 1
+    UPDATE_COMMAND "" TEST_COMMAND "" PATCH_COMMAND ""
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${DEP_INSTALL_DIR}
-    )
+)
 set(DEP_LIST ${DEP_LIST} dep_spdlog)
-set(DEP_LIBS ${DEP_LIBS} spdlog$<$<CONFIG:Debug>:d>) 
+set(DEP_LIBS ${DEP_LIBS} spdlog$<$<CONFIG:Debug>:d>)
 
 # glfw
 ExternalProject_Add(
@@ -23,14 +23,13 @@ ExternalProject_Add(
     GIT_SHALLOW 1
     UPDATE_COMMAND "" PATCH_COMMAND "" TEST_COMMAND ""
     CMAKE_ARGS
-        -DCMAKE_INSTALL_PREFIX=${DEP_INSTALL_DIR}
-        -DGLFW_BUILD_EXAMPLES=OFF   
-        -DGLFW_BUILD_TESTS=OFF     
-        -DGLFW_BUILD_DOCS=OFF
-    )
+    -DCMAKE_INSTALL_PREFIX=${DEP_INSTALL_DIR}
+    -DGLFW_BUILD_EXAMPLES=OFF
+    -DGLFW_BUILD_TESTS=OFF
+    -DGLFW_BUILD_DOCS=OFF
+)
 set(DEP_LIST ${DEP_LIST} dep_glfw)
 set(DEP_LIBS ${DEP_LIBS} glfw3)
-
 
 # glad
 ExternalProject_Add(
@@ -41,10 +40,10 @@ ExternalProject_Add(
     UPDATE_COMMAND ""
     PATCH_COMMAND ""
     CMAKE_ARGS
-        -DCMAKE_INSTALL_PREFIX=${DEP_INSTALL_DIR}
-        -DGLAD_INSTALL=ON # if glad occures an err, comment this line
+    -DCMAKE_INSTALL_PREFIX=${DEP_INSTALL_DIR}
+    -DGLAD_INSTALL=ON # if glad occures an err, comment this line
     TEST_COMMAND ""
-    )
+)
 set(DEP_LIST ${DEP_LIST} dep_glad)
 set(DEP_LIBS ${DEP_LIBS} glad)
 
@@ -60,7 +59,24 @@ ExternalProject_Add(
     BUILD_COMMAND ""
     TEST_COMMAND ""
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy
-        ${PROJECT_BINARY_DIR}/dep_stb-prefix/src/dep_stb/stb_image.h
-        ${DEP_INSTALL_DIR}/include/stb/stb_image.h
-    )
+    ${PROJECT_BINARY_DIR}/dep_stb-prefix/src/dep_stb/stb_image.h
+    ${DEP_INSTALL_DIR}/include/stb/stb_image.h
+)
 set(DEP_LIST ${DEP_LIST} dep_stb)
+
+# glm
+ExternalProject_Add(
+    dep_glm
+    GIT_REPOSITORY "https://github.com/g-truc/glm"
+    GIT_TAG "0.9.9.8"
+    GIT_SHALLOW 1
+    UPDATE_COMMAND ""
+    PATCH_COMMAND ""
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    TEST_COMMAND ""
+    INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${PROJECT_BINARY_DIR}/dep_glm-prefix/src/dep_glm/glm
+    ${DEP_INSTALL_DIR}/include/glm
+)
+set(DEP_LIST ${DEP_LIST} dep_glm)
